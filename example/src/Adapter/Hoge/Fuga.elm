@@ -1,0 +1,1 @@
+module Adapter.Hoge.Fuga exposing (..)
