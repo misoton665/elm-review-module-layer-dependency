@@ -30,19 +30,16 @@ importVisitor : ModuleLayerDependency -> Node Import -> Context -> (List (Error 
 importVisitor layerRule node moduleLayerNumber =
     let
         importingModuleName =
-            Node.value node |> .moduleName |> Node.value
-
-        importingModuleNameAsString =
-            importingModuleName
-                |> List.intersperse "."
-                |> List.foldl (\x acc -> acc ++ x) ""
+            Node.value node
+                |> .moduleName
+                |> Node.value
     in
     if isViolatedWithLayerRule layerRule moduleLayerNumber importingModuleName then
         ( [ Rule.error
             { message = "Found import to upper layer!"
             , details =
                 [ "This module is layer number " ++ String.fromInt moduleLayerNumber ++ "."
-                , "But the module is importing \"" ++ importingModuleNameAsString ++ "\" layer number " ++ (String.fromInt <| layerNumber layerRule importingModuleName) ++ "."
+                , "But the module is importing \"" ++ moduleNameAsString importingModuleName ++ "\" layer number " ++ (String.fromInt <| layerNumber layerRule importingModuleName) ++ "."
                 ]
             }
             (Node.range node)
@@ -58,6 +55,12 @@ importVisitor layerRule node moduleLayerNumber =
 
 type alias  ModuleName
     = List String
+
+
+moduleNameAsString : ModuleName -> String
+moduleNameAsString =
+    List.intersperse "."
+        >> List.foldl (\x acc -> acc ++ x) ""
 
 
 type ModuleLayer
