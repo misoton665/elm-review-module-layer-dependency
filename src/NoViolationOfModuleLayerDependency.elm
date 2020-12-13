@@ -113,23 +113,23 @@ isInLayer : ModuleLayer -> List String -> Bool
 isInLayer layer moduleName =
     case layer of
         ModuleLayer layerModuleNames ->
-            List.any (\layerModuleName -> isMatch layerModuleName moduleName) layerModuleNames
+            List.any (\layerModuleName -> isMatchWith layerModuleName moduleName) layerModuleNames
 
         DefaultLayer ->
             False
 
 
-isMatch : ModuleName -> List String -> Bool
-isMatch names moduleName =
+isMatchWith : ModuleName -> ModuleName -> Bool
+isMatchWith names moduleName =
     let
-        isMatch_ namesX namesY =
+        isMatchWith_ namesX namesY =
             case (namesX, namesY) of
                 ([], _) ->
                     True
 
                 (x :: xs, y :: ys) ->
                     if x == y then
-                        isMatch_ xs ys
+                        isMatchWith_ xs ys
 
                     else
                         False
@@ -137,4 +137,4 @@ isMatch names moduleName =
                 (_ :: _, []) ->
                     False
     in
-    isMatch_ names moduleName
+    isMatchWith_ names moduleName
