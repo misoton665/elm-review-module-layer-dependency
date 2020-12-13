@@ -39,7 +39,7 @@ importVisitor layerRule node moduleLayerNumber =
     in
     if isViolatedWithLayerRule layerRule moduleLayerNumber importingModuleName then
         ( [ Rule.error
-            { message = "Dependency violation of module layer is detected!"
+            { message = "Found import to upper layer!"
             , details =
                 [ "This module is layer number " ++ String.fromInt moduleLayerNumber ++ "."
                 , "But the module is importing \"" ++ importingModuleNameAsString ++ "\" layer number " ++ (String.fromInt <| layerNumber layerRule importingModuleName) ++ "."
