@@ -1,12 +1,65 @@
 module NoViolationOfModuleLayerDependency exposing (rule, ModuleLayer(..), ModuleLayerDependency(..))
 
+{-| If you defined a layer dependency rule like `A <- B`, elm-review-module-layer-dependency will detect an error with below importing.
+   ```elm
+   module A
+
+   import B.Data
+   ```
+
+   Module A depends on module B (`A -> B`) is a violation of defined rule.
+
+# Rule
+@docs rule
+
+# Type
+@docs ModuleLayer, ModuleLayerDependency
+-}
 
 import Elm.Syntax.Import exposing (Import)
 import Elm.Syntax.Module as Module exposing (Module)
 import Elm.Syntax.Node as Node exposing (Node)
 import Review.Rule as Rule exposing (Error, Rule)
 
+{-|
+## Example configuration
+    config : List Rule
+    config =
+        [ NoViolationOfModuleLayerDependency.rule moduleLayerRule
+        ]
 
+
+    moduleLayerRule : ModuleLayerDependency
+    moduleLayerRule =
+        ModuleLayerDependency
+            [ infraLayer
+            , applicationLayer
+            , DefaultLayer
+            , adapterLayer
+            ]
+
+
+    adapterLayer : ModuleLayer
+    adapterLayer =
+        ModuleLayer
+            [ [ "Adapter" ]
+            , [ "Main" ]
+            ]
+
+
+    applicationLayer : ModuleLayer
+    applicationLayer =
+        ModuleLayer
+            [ [ "Application" ]
+            ]
+
+
+    infraLayer : ModuleLayer
+    infraLayer =
+        ModuleLayer
+            [ [ "Infra" ]
+            ]
+-}
 rule : ModuleLayerDependency -> Rule
 rule layerRule =
     Rule.newModuleRuleSchema "NoViolationOfModuleLayerDependency" 0
@@ -62,12 +115,30 @@ moduleNameAsString =
     List.intersperse "."
         >> List.foldl (\x acc -> acc ++ x) ""
 
+{-| Provide module name to define rule.
+## Example
 
+A module `Aaa.Bbb.Ccc` define as ModuleLayer.
+    ModuleLayer
+        [ [ "Aaa", "Bbb", "Ccc" ]
+        ]
+-}
 type ModuleLayer
     = ModuleLayer (List ModuleName)
     | DefaultLayer
 
 
+{-| Provide layer to define rule.
+## Example
+
+Define ModuleLayerDependency use `firstLayer: ModuleLayer` and `secondLayer: ModuleLayer`.
+    [ firstLayer
+    , secondLayer
+    ]
+
+It means dependency like `firstLayer <- secondLayer`.
+If imported secondLayer module in firstLayer, elm-review will detect an error.
+-}
 type ModuleLayerDependency
     = ModuleLayerDependency (List ModuleLayer)
 
